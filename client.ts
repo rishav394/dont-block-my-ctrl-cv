@@ -15,7 +15,8 @@ const ValidateIPaddress = async (ipaddress: string) => {
     if (
       /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
         ipaddress
-      )
+      ) ||
+      ipaddress === "localhost"
     ) {
       axios
         .get(`http://${ipaddress}:3000/ping`)
@@ -44,7 +45,7 @@ ask.question("Enter the IP address of the server: ", async (ip) => {
 const makeRequest = async (text: string) => {
   axios
     .post(`http://${baseIp}:3000/`, {
-      text: text,
+      some: text,
     })
     .then((res) => {
       console.log("Paste successfull");

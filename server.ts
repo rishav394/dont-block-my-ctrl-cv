@@ -34,6 +34,8 @@ app.use(
   })
 );
 
+app.use(bodyParser.json());
+
 app.post("/", (req, res) => {
   clipboard
     .write(req.body.text)
