@@ -49,6 +49,10 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
+app.get("/ping", (req, res) => {
+  res.sendStatus(200);
+});
+
 app.listen(3000, () => {
   console.log("\nListening on port 3000");
 });

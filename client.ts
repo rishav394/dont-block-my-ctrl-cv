@@ -10,23 +10,34 @@ const ask = readline.createInterface({
   output: process.stdout,
 });
 
-function ValidateIPaddress(ipaddress: string) {
-  if (
-    /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
-      ipaddress
-    )
-  ) {
-    return true;
-  }
-  return false;
-}
+const ValidateIPaddress = async (ipaddress: string) => {
+  return new Promise((resolve) => {
+    if (
+      /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
+        ipaddress
+      )
+    ) {
+      axios
+        .get(`http://${ipaddress}:3000/ping`)
+        .then((res) => {
+          baseIp = ipaddress;
+          return resolve(res.status === 200);
+        })
+        .catch(() => resolve(false));
+    } else {
+      console.error("You have entered an invalid IP address!");
+      return resolve(false);
+    }
+  });
+};
 
-ask.question("Enter the IP address of the server: ", (ip) => {
-  if (ValidateIPaddress(ip)) {
+ask.question("Enter the IP address of the server: ", async (ip) => {
+  const allgood = await ValidateIPaddress(ip);
+  if (allgood) {
     baseIp = ip;
     mainProcess();
   } else {
-    console.error("You have entered an invalid IP address!");
+    console.log(`Server was not found running on ${ip}`);
   }
 });
 
@@ -35,14 +46,17 @@ const makeRequest = async (text: string) => {
     .post(`http://${baseIp}:3000/`, {
       text: text,
     })
+    .then((res) => {
+      console.log("Paste successfull");
+    })
     .catch((err) => {
-      console.error(err.message);
+      console.log(err.message);
     });
 };
 
 const readClipboard = async () => {
   try {
-    var newAns = await clipboardy.read();
+    var newAns = clipboardy.readSync();
     if (ans !== newAns) {
       ans = newAns;
       await makeRequest(ans);
@@ -54,5 +68,5 @@ const readClipboard = async () => {
 
 const mainProcess = () => {
   setInterval(readClipboard, 1000);
-  console.log("Watching copy actions");
+  console.log("Connected to server. Watching copy actions.");
 };
