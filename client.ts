@@ -2,22 +2,19 @@
 import axios from "axios";
 import clipboardy from "clipboardy";
 import readline from "readline";
+import { validateIPAddress } from "./util";
 
 let ans = "";
 let baseIp = "localhost";
+
 const ask = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-const ValidateIPaddress = async (ipaddress: string) => {
+const ValidateServerAddress = async (ipaddress: string) => {
   return new Promise((resolve) => {
-    if (
-      /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
-        ipaddress
-      ) ||
-      ipaddress === "localhost"
-    ) {
+    if (validateIPAddress(ipaddress)) {
       axios
         .get(`http://${ipaddress}:3000/ping`)
         .then((res) => {
@@ -33,7 +30,7 @@ const ValidateIPaddress = async (ipaddress: string) => {
 };
 
 ask.question("Enter the IP address of the server: ", async (ip) => {
-  const allgood = await ValidateIPaddress(ip);
+  const allgood = await ValidateServerAddress(ip);
   if (allgood) {
     baseIp = ip;
     mainProcess();

@@ -3,28 +3,10 @@
 import bodyParser from "body-parser";
 import clipboard from "clipboardy";
 import express from "express";
-import os from "os";
 import path from "path";
+import { printAllNetworkInterfaces } from "./util";
 
-var ifaces = os.networkInterfaces();
-
-Object.keys(ifaces).forEach(function (ifname) {
-  var alias = 0;
-
-  ifaces[ifname]?.forEach(function (iface) {
-    if ("IPv4" !== iface.family || iface.internal !== false) {
-      return;
-    }
-
-    if (alias >= 1) {
-      console.log(ifname + ":" + alias, iface.address);
-    } else {
-      console.log(ifname, iface.address);
-    }
-
-    ++alias;
-  });
-});
+printAllNetworkInterfaces();
 
 const app = express();
 
@@ -45,6 +27,15 @@ app.post("/", (req, res) => {
     .catch((err) => {
       res.send(err);
     });
+});
+
+app.get("/clipboard", (req, res) => {
+  try {
+    const value = clipboard.readSync();
+    res.send(`<pre>${value}</pre>`);
+  } catch (err) {
+    res.status(500).json({ message: "Nothing to copy" });
+  }
 });
 
 app.get("/", (req, res) => {

@@ -2,6 +2,10 @@
   "name": "dont-block-my-ctrl-cv",
   "version": "1.2.0",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rishav394/dont-block-my-ctrl-cv.git"
+  },
   "main": "server.js",
   "scripts": {
     "build": "tsc",
