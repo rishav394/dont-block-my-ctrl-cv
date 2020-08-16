@@ -42,7 +42,7 @@ ask.question("Enter the IP address of the server: ", async (ip) => {
 const makeRequest = async (text: string) => {
   axios
     .post(`http://${baseIp}:3000/`, {
-      some: text,
+      text: text,
     })
     .then((res) => {
       console.log("Paste successfull");
